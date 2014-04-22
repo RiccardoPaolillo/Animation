@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreImage/CoreImage.h>
 #import <QuartzCore/QuartzCore.h>
+#import "UIImage+ImageEffects.h"
 
 
 typedef enum kModes
@@ -52,5 +53,12 @@ typedef enum kDirection
 - (void)showView:(float)duration cascade:(BOOL)cascade pulse:(BOOL)pulse;
 
 - (void)pulsetoSize:(float)value withDuration:(float)duration;
+
+- (void)setAnimateMethod:(BOOL)animated type:(NSString *)animationType;
+
+- (UIImage *)toBlurImageWithRadius:(int)radius;
+
+- (void)setParallax:(int)value;
+- (void)addShadow:(CGSize)offset color:(UIColor *)color;
 
 @end

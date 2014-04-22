@@ -12,6 +12,54 @@
 @implementation UIView (Animation)
 
 
+- (void)addShadow:(CGSize)offset color:(UIColor *)color
+{
+    self.layer.masksToBounds = NO;
+    self.layer.shadowColor   = color.CGColor;
+    self.layer.shadowOffset  = CGSizeMake(0.0f, 5.0f);
+    self.layer.shadowOpacity = 1.0f;
+    self.layer.shadowPath    = [UIBezierPath bezierPathWithRect:self.bounds].CGPath;
+}
+
+- (UIImage *)toBlurImageWithRadius:(int)radius
+{
+    UIGraphicsBeginImageContextWithOptions(self.bounds.size, self.opaque, 0.0);
+    [self.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *viewImg = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return [viewImg applyLightEffect:radius];
+}
+
+- (void)setParallax:(int)value
+{
+    UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
+    interpolationHorizontal.minimumRelativeValue = [NSNumber numberWithInt:-value];
+    interpolationHorizontal.maximumRelativeValue = [NSNumber numberWithInt:value];
+    
+    UIInterpolatingMotionEffect *interpolationVertical = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.y" type:UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis];
+    interpolationVertical.minimumRelativeValue = [NSNumber numberWithInt:-value];
+    interpolationVertical.maximumRelativeValue = [NSNumber numberWithInt:value];
+    
+    [self addMotionEffect:interpolationHorizontal];
+    [self addMotionEffect:interpolationVertical];
+}
+
+- (void)setAnimateMethod:(BOOL)animated type:(NSString *)animationType
+{
+    if (animated)
+    {
+        CATransition *transition  = [CATransition animation];
+        transition.duration       = 0.4f;
+        transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+        transition.type           = animationType;
+        [self.layer removeAllAnimations];
+        [self.layer addAnimation:transition forKey:nil];
+    }
+    else
+        [self.layer removeAllAnimations];
+}
+
 - (void)flipToView:(UIView *)newView
 {
     [UIView beginAnimations:nil context:NULL];
@@ -50,7 +98,7 @@
 
 - (void)flipVertival
 {
-    [UIView animateWithDuration:0.5 animations:^
+    [UIView animateWithDuration:0.5 animations:^(void)
     {
         self.layer.transform = CATransform3DMakeRotation(-M_PI_2,1.0,0.0,0.0);
     }
@@ -63,7 +111,7 @@
 
 - (void)flipOrizzontal
 {
-    [UIView animateWithDuration:0.5 animations:^
+    [UIView animateWithDuration:0.5 animations:^(void)
     {
         self.layer.transform = CATransform3DMakeRotation(-M_PI_2,0.0,1.0,0.0);
     }
@@ -76,9 +124,11 @@
 
 - (void)restoreRotation
 {
-    [UIView animateWithDuration:0.5
-                     animations:^{self.layer.transform = CATransform3DMakeRotation(M_PI_2,0.0,0.0,0.0);}
-                     completion:^(BOOL finished){}];
+    [UIView animateWithDuration:0.5 animations:^(void)
+    {
+        self.layer.transform = CATransform3DMakeRotation(M_PI_2,0.0,0.0,0.0);
+    }
+    completion:^(BOOL finished){}];
 }
 
 
